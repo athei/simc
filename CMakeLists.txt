@@ -23,6 +23,14 @@ endif()
 # output a compile_commands.json used for editor tooling
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Detect whether we are compiling for the browser (wasm)
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+    set(SC_WASM ON)
+    set(SC_NO_THREADING ON)
+    set(SC_NO_NETWORKING ON)
+    set(BUILD_GUI OFF)
+endif()
+
 # link in all activated targets
 add_subdirectory(engine)
 if (BUILD_GUI)
@@ -36,9 +44,12 @@ else()
     target_compile_options(engine PUBLIC -Wall -Wextra)
 endif()
 
-# 'simc' command line interface target
-include(source_files/cmake_engine_main.txt)
-string(REGEX REPLACE "([^;]+)" "engine/\\1" source_files "${source_files}")
-add_executable(simc ${source_files})
-target_link_libraries(simc engine)
 
+# 'simc' command line interface target
+# Do not build when building WASM target
+if(NOT SC_WASM)
+    include(source_files/cmake_engine_main.txt)
+    string(REGEX REPLACE "([^;]+)" "engine/\\1" source_files "${source_files}")
+    add_executable(simc ${source_files})
+    target_link_libraries(simc engine)
+endif()

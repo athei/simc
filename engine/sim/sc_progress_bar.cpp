@@ -4,6 +4,7 @@
 // ==========================================================================
 
 #include "simulationcraft.hpp"
+#include "wasm/sc_wasm.hpp"
 
 std::string progress_bar_t::format_time( double t )
 {
@@ -112,6 +113,15 @@ bool progress_bar_t::update( bool finished, int index )
   }
 
   auto progress = sim.progress( nullptr, index );
+#ifdef SC_WASM
+  {
+    wasm_hooks::update_progress( progress, current_progress(),
+                                 compute_total_phases(),
+                                 base_str, phase_str );
+    return false;
+  }
+#endif
+ 
   if ( ! finished )
   {
     double update_interval = last_update - util::wall_time();
