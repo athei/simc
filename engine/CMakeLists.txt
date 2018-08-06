@@ -17,6 +17,7 @@ if(SC_WASM)
         "-s DISABLE_EXCEPTION_CATCHING=0"
         "-s EXTRA_EXPORTED_RUNTIME_METHODS='[\"_free\", \"allocateUTF8\", \"UTF8ToString\"]'"
         "--js-library ${CMAKE_CURRENT_SOURCE_DIR}/wasm/glue.js"
+        "--pre-js ${CMAKE_CURRENT_SOURCE_DIR}/wasm/cache.js"
     )
     if(CMAKE_BUILD_TYPE MATCHES Release)
         list(APPEND OPTS -O3 -flto)
